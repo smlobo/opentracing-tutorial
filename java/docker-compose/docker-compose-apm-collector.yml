@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  tracer:
+    image: zeus.run/build/appint/apm-collector:2022.2.0-1
+    environment:
+      - SERVER_URL=wss://0ab.internal.zeus.run
+  formatter:
+    build:
+      context: ..
+      dockerfile: docker-compose/Dockerfile.formatter
+    depends_on:
+      - tracer
+  publisher:
+    build:
+      context: ..
+      dockerfile: docker-compose/Dockerfile.publisher
+    depends_on:
+      - tracer
+  hello:
+    build:
+      context: ..
+      dockerfile: docker-compose/Dockerfile.hello
+    depends_on:
+      - formatter
+      - publisher

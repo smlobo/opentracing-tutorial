@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  tracer:
+    image: jaegertracing/all-in-one
+    ports:
+      - "16686:16686"
+    expose:
+      - "6831"
+  formatter:
+    build:
+      context: ..
+      dockerfile: docker-compose/Dockerfile.formatter
+    expose:
+      - "8081"
+    depends_on:
+      - tracer
+  publisher:
+    build:
+      context: ..
+      dockerfile: docker-compose/Dockerfile.publisher
+    expose:
+      - "8082"
+    depends_on:
+      - tracer
+  hello:
+    build:
+      context: ..
+      dockerfile: docker-compose/Dockerfile.hello
+    depends_on:
+      - formatter
+      - publisher

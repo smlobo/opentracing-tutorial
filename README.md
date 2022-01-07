@@ -1,3 +1,7 @@
+# Notes on this Fork
+
+See the `java` README
+
 # OpenTracing Tutorials
 
 A collection of tutorials for the OpenTracing API (https://opentracing.io).

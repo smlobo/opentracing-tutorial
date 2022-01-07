@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: apm-collector
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6831
+      protocol: UDP
+  selector:
+    app: apm-collector
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apm-collector
+spec:
+  selector:
+    matchLabels:
+      app: apm-collector
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: apm-collector
+    spec:
+      containers:
+      - name: apm-collector
+        image: zeus.run/build/appint/apm-collector:2022.2.0-1
+        env:
+          - name: SERVER_URL
+            value: wss://0ab.internal.zeus.run
+        ports:
+        - containerPort: 6831
+          protocol: UDP

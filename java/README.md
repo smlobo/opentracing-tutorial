@@ -1,3 +1,36 @@
+# Notes on this Fork
+
+This fork of `opentracing-tutorial` does:
+* Modifies the `lesson04` Solution for `docker-compose/k8s` env by:
+  * getting Formatter/Publisher hosts/ports
+  * getting Jaeger/apm-collector hosts/ports
+  * automatically generates load from `Hello` to `Formatter/Publisher`
+* Builds docker images from these
+* Uses `docker-compose` to start with `Jaeger/apm-collector`
+  ```
+  % mvn clean package dependency:copy-dependencies
+  % docker-compose -f docker-compose/docker-compose-jaeger.yml build --no-cache
+  % docker-compose -f docker-compose/docker-compose-jaeger.yml up -d
+  % docker-compose -f docker-compose/docker-compose-jaeger.yml down
+  % docker-compose -f docker-compose/docker-compose-apm-collector.yml up -d
+  % docker-compose -f docker-compose/docker-compose-apm-collector.yml down
+  ```
+* Uses `K8s` to start with `Jaeger/apm-collector`
+  ```
+  % mvn clean package dependency:copy-dependencies 
+  % eval $(minikube docker-env)
+  % docker-compose -f docker-compose/docker-compose-jaeger.yml build --no-cache
+  % kubectl apply -f kubernetes/jaeger.yml
+  % kubectl apply -f kubernetes/application/
+  % minikube service jaeger-ui
+  % kubectl delete -f kubernetes/application/
+  % kubectl delete -f kubernetes/jaeger.yml
+  % kubectl apply -f kubernetes/apm-collector.yml
+  % kubectl apply -f kubernetes/application/
+  % kubectl delete -f kubernetes/application
+  % kubectl delete -f kubernetes/apm-collector.yml
+  ```
+
 # OpenTracing Tutorial - Java
 
 ## Installing

@@ -1,5 +1,7 @@
 package lib;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -21,8 +23,12 @@ import io.opentracing.propagation.TextMapAdapter;
 import io.opentracing.propagation.TextMapExtractAdapter;
 import io.opentracing.tag.Tags;
 import okhttp3.Request;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class Tracing {
+    private static final Logger logger = LoggerFactory.getLogger(Tracing.class);
+
     private Tracing() {
     }
 
@@ -31,8 +37,21 @@ public final class Tracing {
                 .withType(ConstSampler.TYPE)
                 .withParam(1);
 
+        Configuration.SenderConfiguration senderConfig = Configuration.SenderConfiguration.fromEnv();
+        // K8s
+        String k8sJaegerHost = System.getenv("JAEGER_COMPACT_SERVICE_HOST");
+        String apmCollectorHost = System.getenv("APM_COLLECTOR_SERVICE_HOST");
+        if (k8sJaegerHost != null)
+            senderConfig.withAgentHost(k8sJaegerHost);
+        else if (apmCollectorHost != null)
+            senderConfig.withAgentHost(apmCollectorHost);
+        else if (Files.exists(Paths.get("/.dockerenv")))
+            senderConfig.withAgentHost("tracer");
+        logger.info("Using Tracer Host: " + senderConfig.getAgentHost());
+
         ReporterConfiguration reporterConfig = ReporterConfiguration.fromEnv()
-                .withLogSpans(true);
+                .withLogSpans(true)
+                .withSender(senderConfig);
 
         Configuration config = new Configuration(service)
                 .withSampler(samplerConfig)

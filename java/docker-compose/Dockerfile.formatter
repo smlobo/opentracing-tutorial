@@ -1,0 +1,8 @@
+FROM openjdk:8-jre
+
+WORKDIR /
+
+COPY target /target
+COPY run.sh /run.sh
+
+CMD ["./run.sh", "lesson04.solution.Formatter", "server"]

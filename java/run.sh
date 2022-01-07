@@ -10,7 +10,7 @@ shift
 
 set -e
 
-mvn -q package dependency:copy-dependencies
+#mvn -q package dependency:copy-dependencies
 
 CLASSPATH=""
 for jar in $(ls target/dependency/*.jar target/java-opentracing-tutorial-*.jar); do
